@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>devFlix</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css' ) }}">
+</head>
+<body>
+    <header class="navbar">
+        <h1 class="logo">Dev<span>FLIX</span></h1>
+    </header>
+
+    <section class="container">
+
+        <div class="header-section">
+            <h2 class="section-title">Catálogo de Filmes</h2>
+            <a href="{{ url_for('adicionar_filme') }}" class="btn-add">
+                + Adicionar Filme
+            </a>
+        </div>
+
+        <div class="grid-filmes">
+            {% for filme in filmes %}
+            <div class="card">
+                <div class="card-content">
+                    <h3>Titulo: {{filme.titulo}}</h3>
+                    <img src="{{ filme.poster_url }}" alt="Poster de {{ filme.titulo }}" class="poster-filme"> 
+                    <p><strong>Data Lançamento: {{filme.ano.strftime("%d/%m/%Y")}}</strong></p>
+                    <p><strong>Gênero: {{filme.genero}}</strong></p>
+                    <div class="card-actions">
+                        <a href="{{ url_for('atualizar_filme', filme_id=filme.id) }}" class="btn-edit">
+                            editar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Filme - devFlix</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="navbar">
+        <h1 class="logo">
+            Dev<span>FLIX</span>
+        </h1>
+    </header>
+    <section class="form-container">
+        <h2>
+            Editar Filme
+        </h2>
+        <form class="form-filme" method="PUT">
+            <input type="text" name="titulo" placeholder="Nome do Filme" required>
+            <input type="text" name="poster_url" placeholder="URL do Poster" required>
+            <input type="date" name="ano" placeholder="Ano de Lançamento" required>
+            <input type="text" name="genero" placeholder="Gênero" required>
+
+            <button type="submit" class="btn-save">
+                Salvar
+            </button>
+        </form>
+
+        <a href="{{ url_for('atualizar_filme', id=filme.id) }}" class="btn-back">
+            voltar para catálogo
+        </a>
+
+    </section>
+</body>
+</html>
