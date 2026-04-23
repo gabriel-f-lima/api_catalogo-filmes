@@ -1,36 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Filme - devFlix</title>
+    <title>Editar Filme - DevFLIX</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
 </head>
+
 <body>
+
     <header class="navbar">
-        <h1 class="logo">
-            Dev<span>FLIX</span>
-        </h1>
+        <h1 class="logo">Dev<span>FLIX</span></h1>
     </header>
+
     <section class="form-container">
-        <h2>
-            Editar Filme
-        </h2>
-        <form class="form-filme" method="PUT">
-            <input type="text" name="titulo" placeholder="Nome do Filme" required>
-            <input type="text" name="poster_url" placeholder="URL do Poster" required>
-            <input type="date" name="ano" placeholder="Ano de Lançamento" required>
-            <input type="text" name="genero" placeholder="Gênero" required>
+        <h2>Editar Filme</h2>
+
+        <form method="POST" enctype="multipart/form-data" class="form-filme">
+            <input type="text" name="titulo" placeholder="Nome do filme" value="{{ filme.titulo }}" required>
+            <input type="text" name="genero" placeholder="Gênero" value="{{ filme.genero }}" required>
+            <input type="date" name="ano" placeholder="Ano" value="{{ filme.ano }}" required>
+
+            <div class="upload-area" id="upload-area">
+                {% if filme.url_capa %}
+                <img id="preview-img" class="preview-img" src="{{ url_for('static', filename=filme.url_capa) }}" alt="Capa atual">
+                <div id="upload-placeholder" class="upload-placeholder" style="display:none;">
+                {% else %}
+                <img id="preview-img" class="preview-img" style="display:none;" alt="Preview">
+                <div id="upload-placeholder" class="upload-placeholder">
+                {% endif %}
+                    <span class="upload-icon">📁</span>
+                    <p>Clique ou arraste para trocar a imagem</p>
+                    <span class="upload-hint">PNG, JPG, JPEG, GIF ou WEBP</span>
+                </div>
+                <input type="file" name="capa" id="input-capa" accept="image/*">
+            </div>
+            <span class="upload-note">* Deixe vazio para manter a imagem atual</span>
 
             <button type="submit" class="btn-save">
-                Salvar
+                Salvar Alterações
             </button>
         </form>
 
-        <a href="{{ url_for('atualizar_filme', id=filme.id) }}" class="btn-back">
-            voltar para catálogo
+        <a href="{{ url_for('listar_filmes') }}" class="btn-back">
+            ← Voltar ao catálogo
         </a>
-
     </section>
+
+    {% include 'components/loading.html' %}
+
+    <script>
+        const inputCapa = document.getElementById('input-capa');
+        const previewImg = document.getElementById('preview-img');
+        const placeholder = document.getElementById('upload-placeholder');
+        const uploadArea = document.getElementById('upload-area');
+
+        inputCapa.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        uploadArea.addEventListener('click', function () {
+            inputCapa.click();
+        });
+
+        uploadArea.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', function () {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) {
+                inputCapa.files = e.dataTransfer.files;
+                inputCapa.dispatchEvent(new Event('change'));
+            }
+        });
+
+        window.addEventListener('load', () => {
+            Loading.attachToForms('Atualizando banco de dados...');
+            Loading.attachToLinks('.btn-back', 'Voltando para o catálogo...');
+        });
+    </script>
 </body>
+
 </html>

@@ -1,36 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novo Filme - devFlix</title>
+    <title>Novo Filme - DevFLIX</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
 </head>
+
 <body>
+
     <header class="navbar">
-        <h1 class="logo">
-            Dev<span>FLIX</span>
-        </h1>
+        <h1 class="logo">Dev<span>FLIX</span></h1>
     </header>
+
     <section class="form-container">
-        <h2>
-            Cadastrar Novo Filme
-        </h2>
-        <form class="form-filme" method="POST">
-            <input type="text" name="titulo" placeholder="Nome do Filme" required>
-            <input type="text" name="poster_url" placeholder="URL do Poster" required>
-            <input type="date" name="ano" placeholder="Ano de Lançamento" required>
+        <h2>Cadastrar Novo Filme</h2>
+
+        <form method="POST" enctype="multipart/form-data" class="form-filme">
+            <input type="text" name="titulo" placeholder="Nome do filme" required>
             <input type="text" name="genero" placeholder="Gênero" required>
+            <input type="date" name="ano" placeholder="Ano" required>
+
+            <div class="upload-area" id="upload-area">
+                <img id="preview-img" class="preview-img" style="display:none;" alt="Preview">
+                <div id="upload-placeholder" class="upload-placeholder">
+                    <span class="upload-icon">📁</span>
+                    <p>Clique ou arraste a imagem da capa</p>
+                    <span class="upload-hint">PNG, JPG ou JPEG</span>
+                </div>
+                <input type="file" name="capa" id="input-capa" accept="image/*" required>
+            </div>
 
             <button type="submit" class="btn-save">
-                Salvar
+                Salvar Filme
             </button>
         </form>
 
         <a href="{{ url_for('listar_filmes') }}" class="btn-back">
-            voltar para catálogo
+            ← Voltar ao catálogo
         </a>
-
     </section>
+
+    {% include 'components/loading.html' %}
+
+    <script>
+        // Preview da imagem selecionada
+        const inputCapa = document.getElementById('input-capa');
+        const previewImg = document.getElementById('preview-img');
+        const placeholder = document.getElementById('upload-placeholder');
+        const uploadArea = document.getElementById('upload-area');
+
+        inputCapa.addEventListener('change', function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    previewImg.style.display = 'block';
+                    placeholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Clique na área de upload abre o seletor de arquivo
+        uploadArea.addEventListener('click', function () {
+            inputCapa.click();
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+
+        uploadArea.addEventListener('dragleave', function () {
+            uploadArea.classList.remove('drag-over');
+        });
+
+        uploadArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            if (e.dataTransfer.files.length) {
+                inputCapa.files = e.dataTransfer.files;
+                inputCapa.dispatchEvent(new Event('change'));
+            }
+        });
+
+        window.addEventListener('load', () => {
+            Loading.attachToForms('Gravando no banco...');
+            Loading.attachToLinks('.btn-back', 'Voltando para o catálogo...');
+        });
+    </script>
 </body>
+
 </html>

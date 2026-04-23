@@ -1,10 +1,9 @@
 import psycopg2
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def get_connection():
-    conn = psycopg2.connect(
-        host='localhost',
-        database='catalogo_filmes',
-        user='postgres',
-        password='1234',
-    )
+    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
     return conn

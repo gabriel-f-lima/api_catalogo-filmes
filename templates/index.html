@@ -1,21 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>devFlix</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css' ) }}">
+    <title>DevFlix</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='js/loading.js') }}"></script>
 </head>
+
 <body>
+
     <header class="navbar">
         <h1 class="logo">Dev<span>FLIX</span></h1>
     </header>
 
     <section class="container">
-
         <div class="header-section">
             <h2 class="section-title">Catálogo de Filmes</h2>
-            <a href="{{ url_for('adicionar_filme') }}" class="btn-add">
+            <a href="{{ url_for('novo_filme') }}" class="btn-add">
                 + Adicionar Filme
             </a>
         </div>
@@ -24,19 +26,41 @@
             {% for filme in filmes %}
             <div class="card">
                 <div class="card-content">
-                    <h3>Titulo: {{filme.titulo}}</h3>
-                    <img src="{{ filme.poster_url }}" alt="Poster de {{ filme.titulo }}" class="poster-filme"> 
-                    <p><strong>Data Lançamento: {{filme.ano.strftime("%d/%m/%Y")}}</strong></p>
-                    <p><strong>Gênero: {{filme.genero}}</strong></p>
-                    <div class="card-actions">
-                        <a href="{{ url_for('atualizar_filme', filme_id=filme.id) }}" class="btn-edit">
-                            editar
-                        </a>
+                    <h3>{{ filme.titulo }}</h3>
+                    {% if filme.url_capa %}
+                    <img src="{{ url_for('static', filename=filme.url_capa) }}" alt="{{ filme.titulo }}" class="card-img">
+                    {% else %}
+                    <div class="card-img card-img-placeholder">🎬</div>
+                    {% endif %}
+                    <p><strong>Gênero:</strong> {{filme.genero}}</p>
+                    <p><strong>Lançamento:</strong> {{ filme.ano }}</p>
+                    <div style="margin-top: 15px;">
+                        <a href="{{ url_for('editar_filme', id=filme.id) }}"
+                            style="padding: 5px 10px; background-color: #f39c12; color: white; text-decoration: none; border-radius: 4px; margin-right: 5px;">Editar</a>
+                        <form action="{{ url_for('deletar_filme', id=filme.id) }}" method="POST"
+                            style="display:inline;">
+                            <button type="submit" onclick="return confirm('Tem certeza que deseja excluir?');"
+                                style="padding: 5px 10px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Excluir</button>
+                        </form>
                     </div>
+
                 </div>
+            </div>
+            {% else %}
+            <div class="empty-message">
+                <h3>Nenhum filme disponível</h3>
             </div>
             {% endfor %}
         </div>
     </section>
+    {% include 'components/loading.html' %}
+
+    <script>
+        window.addEventListener('load', () => {
+            Loading.attachToForms('Excluindo filme...');
+            Loading.attachToLinks('.btn-add, .card-content a', 'Carregando...');
+        });
+    </script>
 </body>
+
 </html>
